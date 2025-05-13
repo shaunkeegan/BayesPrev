@@ -13,7 +13,7 @@ identify_epi_data <- function(data, counts = NULL, groups = NULL) {
   })
   
   # Convert to tibble
-  data <- as_tibble(data)
+  if (!tibble::is_tibble(data)) data <- as_tibble(data)
   
   # MANUAL MODE (when counts specified)
   if (!is.null(counts)) {
@@ -56,14 +56,25 @@ identify_epi_data <- function(data, counts = NULL, groups = NULL) {
         cli_h2("Available Grouping Variables")
         cli_ol(potential_groups)
         selection <- readline(prompt = "Enter numbers of groups to include (space-separated, 0 for none): ")
-        selected_indices <- as.numeric(strsplit(selection, " ")[[1]])
         
-        if (!all(selected_indices %in% seq_along(potential_groups))) {
-          stop("Invalid group selection - please enter numbers corresponding to the list")
-        }
-        
-        if (!0 %in% selected_indices) {
+        # Handle '0' input first
+        if (selection == "0") {
+          cli_alert_info("No grouping variables selected")
+        } else {
+          selected_indices <- as.numeric(strsplit(selection, " ")[[1]])
+          
+          # Check for valid numeric input
+          if (any(is.na(selected_indices))) {
+            stop("Invalid input - please enter numbers separated by spaces")
+          }
+          
+          # Check indices are within range
+          if (!all(selected_indices %in% seq_along(potential_groups))) {
+            stop("Invalid group selection - please enter numbers corresponding to the list")
+          }
+          
           group_vars <- potential_groups[selected_indices]
+          cli_alert_success(paste("Including groups:", paste(group_vars, collapse = ", ")))
         }
       }
     }
@@ -74,7 +85,6 @@ identify_epi_data <- function(data, counts = NULL, groups = NULL) {
     )
     
     if (length(group_vars) > 0) {
-      cli_alert_success(paste("Including groups:", paste(group_vars, collapse = ", ")))
       result <- bind_cols(result, select(data, all_of(group_vars)))
     }
     
@@ -153,13 +163,20 @@ identify_epi_data <- function(data, counts = NULL, groups = NULL) {
       cli_h2("Available Grouping Variables")
       cli_ol(potential_groups)
       selection <- readline(prompt = "Enter numbers of groups to include (space-separated, 0 for none): ")
-      selected_indices <- as.numeric(strsplit(selection, " ")[[1]])
       
-      if (length(selected_indices) == 1 && selected_indices == 0) {
+      if (selection == "0") {
         cli_alert_info("No grouping variables selected")
-      } else if (!all(selected_indices %in% seq_along(potential_groups))) {
-        stop("Invalid group selection - please enter numbers corresponding to the list")
       } else {
+        selected_indices <- as.numeric(strsplit(selection, " ")[[1]])
+        
+        if (any(is.na(selected_indices))) {
+          stop("Invalid input - please enter numbers separated by spaces")
+        }
+        
+        if (!all(selected_indices %in% seq_along(potential_groups))) {
+          stop("Invalid group selection - please enter numbers corresponding to the list")
+        }
+        
         group_vars <- potential_groups[selected_indices]
         cli_alert_success(paste("Selected groups:", paste(group_vars, collapse = ", ")))
       }
