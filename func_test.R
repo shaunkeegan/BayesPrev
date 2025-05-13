@@ -1,4 +1,5 @@
 library(dplyr)
+source("funcs/identify_epi_data.R")
 testdat1 <- read.csv("sample_data.csv") # Insert your own data here
 
 # Automatic Mode
