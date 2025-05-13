@@ -15,7 +15,7 @@ identify_epi_data <- function(data, counts = NULL, groups = NULL) {
   # Convert to tibble
   data <- as_tibble(data)
   
-  # MANUAL MODE (when counts specified) - unchanged
+  # MANUAL MODE (when counts specified)
   if (!is.null(counts)) {
     if (length(counts) != 2) stop("Please specify exactly two column names for counts")
     if (!all(counts %in% names(data))) {
@@ -92,8 +92,7 @@ identify_epi_data <- function(data, counts = NULL, groups = NULL) {
       filter(event != n) %>%
       rowwise() %>%
       mutate(
-        valid = all(data[[event]] <= data[[n]], na.rm = TRUE),
-        perfect_match = sum(data[[event]] == data[[n]], na.rm = TRUE)
+        valid = all(data[[event]] <= data[[n]], na.rm = TRUE)
       ) %>%
       ungroup() %>%
       filter(valid) %>%
@@ -118,8 +117,7 @@ identify_epi_data <- function(data, counts = NULL, groups = NULL) {
       pair <- valid_pairs[i, ]
       cli_li(paste0(
         "[", i, "] ", pair$prefix_match, " ",
-        "{.field ", pair$event, "} → {.field ", pair$n, "} ",
-        "(perfect matches: ", pair$perfect_match, ")"
+        "{.field ", pair$event, "} → {.field ", pair$n, "}"
       ))
     }
     cli_end()
@@ -182,7 +180,7 @@ identify_epi_data <- function(data, counts = NULL, groups = NULL) {
   )
   
   if (length(group_vars) > 0) {
-    result <- bind_cols(result, select(data, all_of(group_vars)))
+    result <- bind_cols(result, select(data, all_of(group_vars))
   }
   
   attr(result, "all_valid_pairs") <- valid_pairs
