@@ -180,7 +180,7 @@ identify_epi_data <- function(data, counts = NULL, groups = NULL) {
   )
   
   if (length(group_vars) > 0) {
-    result <- bind_cols(result, select(data, all_of(group_vars))
+    result <- bind_cols(result, select(data, all_of(group_vars)))
   }
   
   attr(result, "all_valid_pairs") <- valid_pairs
