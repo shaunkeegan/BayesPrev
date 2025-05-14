@@ -1,3 +1,14 @@
+## identify_epi_data
+##
+## args:data
+##      counts (default = NULL)
+##      groups (default = NULL)
+##
+## output: result (a tibble) 
+##
+##
+
+
 identify_epi_data <- function(data, counts = NULL, groups = NULL) {
   # Check input
   if (!is.data.frame(data)) stop("Input must be a data frame or tibble")
